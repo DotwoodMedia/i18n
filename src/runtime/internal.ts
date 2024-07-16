@@ -341,6 +341,8 @@ export function getLocaleDomain(
           domain = locale.domain.replace(/(http|https):\/\//, '')
         }
         return domain === host
+      } else if (Array.isArray(locale?.domains)) {
+        return locale.domains.includes(host)
       }
       return false
     })
@@ -381,7 +383,9 @@ export function getLocaleDomain(
 
         if (!matchingLocale) {
           // Fall back to default language on this domain - if set
-          matchingLocale = matchingLocales.find(l => l.domainDefault)
+          matchingLocale = matchingLocales.find(l =>
+            Array.isArray(l.defaultForDomains) ? l.defaultForDomains.includes(host) : l.domainDefault
+          )
           __DEBUG__ &&
             console.log(
               `MultiDomainsMultiLocales: matching locale not found - trying to get default for this domain. MatchingLocale is now`,
@@ -403,10 +407,15 @@ export function getLocaleDomain(
 export function getDomainFromLocale(localeCode: Locale): string | undefined {
   const runtimeConfig = useRuntimeConfig()
   const nuxtApp = useNuxtApp()
+  const host = getHost()
   // lookup the `differentDomain` origin associated with given locale.
-  const config = runtimeConfig.public.i18n as { locales?: Record<Locale, { domain?: string }> }
+  const config = runtimeConfig.public.i18n as { locales?: Record<Locale, { domain?: string; domains?: string[] }> }
   const lang = normalizedLocales.find(locale => locale.code === localeCode)
-  const domain = config?.locales?.[localeCode]?.domain ?? lang?.domain
+  const domain =
+    config?.locales?.[localeCode]?.domain ||
+    lang?.domain ||
+    config?.locales?.[localeCode]?.domains?.find((v: string) => v === host) ||
+    lang?.domains?.find((v: string) => v === host)
 
   if (domain) {
     if (hasProtocol(domain, { strict: true })) {

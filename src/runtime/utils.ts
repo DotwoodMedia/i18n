@@ -298,6 +298,12 @@ export function detectRedirect({
     }
   }
 
+  // TODO check!
+  // if (multiDomain && redirectPath === '' && routeLocaleGetter(route.to) === targetLocale) {
+  //   const routePath = switchLocalePath(common, targetLocale, route.to)
+  //   redirectPath = routePath.replace(`/${targetLocale}`, '/')
+  // }
+
   return redirectPath
 }
 

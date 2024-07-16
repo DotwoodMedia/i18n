@@ -122,6 +122,7 @@ export type NuxtI18nOptions<
    * @defaultValue `false`
    */
   differentDomains?: boolean
+  multiDomain?: boolean
   detectBrowserLanguage?: DetectBrowserLanguageOptions | false
   langDir?: string | null
   lazy?: boolean
@@ -246,6 +247,8 @@ export interface LocaleObject extends Record<string, any> {
   name?: string
   dir?: Directions
   domain?: string
+  domains?: string[]
+  defaultForDomains?: string[]
   file?: string | LocaleFile
   files?: string[] | LocaleFile[]
   isCatchallLocale?: boolean
