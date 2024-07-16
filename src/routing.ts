@@ -184,9 +184,9 @@ export function localizeRoutes(routes: NuxtPage[], options: LocalizeRoutesParams
       // Create an alias to avoid unique names
       if (options.multiDomain) {
         if (localized.alias) {
-          toArray(localized.alias).push('/')
+          toArray(localized.alias).push(route.path)
         } else {
-          localized.alias = ['/']
+          localized.alias = [route.path]
         }
       }
 

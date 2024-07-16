@@ -10,7 +10,8 @@ import {
   getLocaleDomain,
   getDomainFromLocale,
   DefaultDetectBrowserLanguageFromResult,
-  runtimeDetectBrowserLanguage
+  runtimeDetectBrowserLanguage,
+  getHost
 } from './internal'
 import { loadLocale, makeFallbackLocaleCodes } from './messages'
 import {
@@ -160,7 +161,7 @@ export function detectLocale(
   detectLocaleContext: DetectLocaleContext,
   runtimeI18n: ModulePublicRuntimeConfig['i18n']
 ) {
-  const { strategy, defaultLocale, differentDomains } = runtimeI18n
+  const { strategy, defaultLocale, differentDomains, multiDomain } = runtimeI18n
   const _detectBrowserLanguage = runtimeDetectBrowserLanguage(runtimeI18n)
 
   const initialLocale = isFunction(initialLocaleLoader) ? initialLocaleLoader() : initialLocaleLoader
@@ -201,7 +202,7 @@ export function detectLocale(
   __DEBUG__ && console.log('detectLocale: finaleLocale first (finaleLocale, strategy) -', finalLocale, strategy)
 
   if (!finalLocale) {
-    if (differentDomains) {
+    if (differentDomains || multiDomain) {
       finalLocale = getLocaleDomain(normalizedLocales, strategy, route)
     } else if (strategy !== 'no_prefix') {
       finalLocale = routeLocaleGetter(route)
@@ -298,12 +299,6 @@ export function detectRedirect({
     }
   }
 
-  // TODO check!
-  // if (multiDomain && redirectPath === '' && routeLocaleGetter(route.to) === targetLocale) {
-  //   const routePath = switchLocalePath(common, targetLocale, route.to)
-  //   redirectPath = routePath.replace(`/${targetLocale}`, '/')
-  // }
-
   return redirectPath
 }
 
@@ -331,7 +326,8 @@ export async function navigate(
   { status = 302, enableNavigate = false }: { status?: number; enableNavigate?: boolean } = {}
 ) {
   const { nuxtApp, i18n, locale, route } = args
-  const { rootRedirect, differentDomains, skipSettingLocaleOnNavigate } = nuxtApp.$config.public.i18n
+  const { rootRedirect, differentDomains, multiDomain, skipSettingLocaleOnNavigate, configLocales } =
+    nuxtApp.$config.public.i18n
   let { redirectPath } = args
 
   __DEBUG__ &&
@@ -363,6 +359,23 @@ export async function navigate(
       i18n.__resolvePendingLocalePromise = resolve
     })
     if (!enableNavigate) {
+      return
+    }
+  }
+
+  if (multiDomain) {
+    const host = getHost()
+    const defaultLocaleForDomain = configLocales.find(locale => {
+      if (typeof locale !== 'string') {
+        return locale.defaultForDomains?.find(domain => domain === host)
+      }
+
+      return false
+    })
+
+    if (route.path.startsWith(`/${defaultLocaleForDomain?.code}`)) {
+      return _navigate(route.path.replace(`/${defaultLocaleForDomain?.code}`, ''), status)
+    } else {
       return
     }
   }
