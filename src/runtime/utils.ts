@@ -41,7 +41,7 @@ import type { Ref } from '#imports'
 import type { Router } from '#vue-router'
 import type { DetectLocaleContext } from './internal'
 import type { HeadSafe } from '@unhead/vue'
-import type { GetLocaleFromRouteFunction } from './routing/extends/router'
+import { createLocaleFromRouteGetter, type GetLocaleFromRouteFunction } from './routing/extends/router'
 import type { RouteLocationNormalized, RouteLocationNormalizedLoaded } from 'vue-router'
 import type { RuntimeConfig } from '@nuxt/schema'
 import type { ModulePublicRuntimeConfig } from '../module'
@@ -375,9 +375,20 @@ export async function navigate(
 
     if (route.path.startsWith(`/${defaultLocaleForDomain?.code}`)) {
       return _navigate(route.path.replace(`/${defaultLocaleForDomain?.code}`, ''), status)
-    } else {
-      return
+    } else if (!route.path.startsWith(`/${locale}`) && locale !== defaultLocaleForDomain?.code) {
+      const getLocaleFromRoute = createLocaleFromRouteGetter()
+      const oldLocale = getLocaleFromRoute(route.path)
+
+      if (oldLocale !== '') {
+        return _navigate(`/${locale + route.path.replace(`/${oldLocale}`, '')}`, status)
+      } else {
+        return _navigate(`/${locale + route.path.replace('/', '')}`, status)
+      }
+    } else if (redirectPath && route.path !== redirectPath) {
+      return _navigate(redirectPath, status)
     }
+
+    return
   }
 
   if (!differentDomains) {

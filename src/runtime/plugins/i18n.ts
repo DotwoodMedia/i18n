@@ -80,7 +80,6 @@ export default defineNuxtPlugin({
             router.removeRoute(route.name)
           } else {
             const newRouteName = route.name.toString().replace('___default', '')
-            router.removeRoute(newRouteName)
             route.name = newRouteName
           }
         }
