@@ -1,6 +1,13 @@
 import { computed, ref, watch } from 'vue'
 import { createI18n } from 'vue-i18n'
-import { defineNuxtPlugin, useRoute, addRouteMiddleware, defineNuxtRouteMiddleware, useNuxtApp } from '#imports'
+import {
+  defineNuxtPlugin,
+  useRoute,
+  addRouteMiddleware,
+  defineNuxtRouteMiddleware,
+  useNuxtApp,
+  useRouter
+} from '#imports'
 import {
   localeCodes,
   vueI18nConfigs,
@@ -45,7 +52,7 @@ export default defineNuxtPlugin({
     const { vueApp: app } = nuxt
     const nuxtContext = nuxt as unknown as NuxtApp
     const host = getHost()
-    const { configLocales, defaultLocale } = nuxtContext.$config.public.i18n
+    const { configLocales, defaultLocale, multiDomain } = nuxtContext.$config.public.i18n
 
     const hasDefaultForDomains = configLocales.some(
       (l): l is LocaleObject => typeof l !== 'string' && Array.isArray(l.defaultForDomains)
@@ -62,6 +69,22 @@ export default defineNuxtPlugin({
       defaultLocaleDomain = findDefaultLocale?.code ?? ''
     } else {
       defaultLocaleDomain = ''
+    }
+
+    if (multiDomain) {
+      const router = useRouter()
+      router.getRoutes().forEach(route => {
+        if (route.name?.toString().includes('___default')) {
+          const routeNameLocale = route.name.toString().split('___')[1]
+          if (routeNameLocale !== defaultLocaleDomain) {
+            router.removeRoute(route.name)
+          } else {
+            const newRouteName = route.name.toString().replace('___default', '')
+            router.removeRoute(newRouteName)
+            route.name = newRouteName
+          }
+        }
+      })
     }
 
     // Fresh copy per request to prevent reusing mutated options

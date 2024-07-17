@@ -145,6 +145,13 @@ export function localizeRoutes(routes: NuxtPage[], options: LocalizeRoutesParams
         extra
       )
       if (localePrefixable) {
+        if (options.multiDomain) {
+          localizedRoutes.push({
+            ...localized,
+            name: `${localized.name}___default`
+          })
+        }
+
         localized.path = join('/', locale, localized.path)
 
         if (isDefaultLocale && options.strategy === 'prefix' && options.includeUnprefixedFallback) {
@@ -182,13 +189,13 @@ export function localizeRoutes(routes: NuxtPage[], options: LocalizeRoutesParams
       }
 
       // Create an alias to avoid unique names
-      if (options.multiDomain) {
-        if (localized.alias) {
-          toArray(localized.alias).push(route.path)
-        } else {
-          localized.alias = [route.path]
-        }
-      }
+      // if (options.multiDomain) {
+      //   if (localized.alias) {
+      //     toArray(localized.alias).push(route.path)
+      //   } else {
+      //     localized.alias = [route.path]
+      //   }
+      // }
 
       localized.path &&= adjustRoutePathForTrailingSlash(localized, options.trailingSlash)
 
