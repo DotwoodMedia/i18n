@@ -188,15 +188,6 @@ export function localizeRoutes(routes: NuxtPage[], options: LocalizeRoutesParams
         localized.alias = localizedAliases
       }
 
-      // Create an alias to avoid unique names
-      // if (options.multiDomain) {
-      //   if (localized.alias) {
-      //     toArray(localized.alias).push(route.path)
-      //   } else {
-      //     localized.alias = [route.path]
-      //   }
-      // }
-
       localized.path &&= adjustRoutePathForTrailingSlash(localized, options.trailingSlash)
 
       // remove parent path from child route

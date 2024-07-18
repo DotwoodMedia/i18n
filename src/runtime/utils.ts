@@ -365,17 +365,18 @@ export async function navigate(
 
   if (multiDomain) {
     const host = getHost()
-    const defaultLocaleForDomain = configLocales.find(locale => {
+    const currentDomain = configLocales.find(locale => {
       if (typeof locale !== 'string') {
         return locale.defaultForDomains?.find(domain => domain === host)
       }
 
       return false
     })
+    const defaultLocaleForDomain = typeof currentDomain !== 'string' ? currentDomain?.code : undefined
 
-    if (route.path.startsWith(`/${defaultLocaleForDomain?.code}`)) {
-      return _navigate(route.path.replace(`/${defaultLocaleForDomain?.code}`, ''), status)
-    } else if (!route.path.startsWith(`/${locale}`) && locale !== defaultLocaleForDomain?.code) {
+    if (route.path.startsWith(`/${defaultLocaleForDomain}`)) {
+      return _navigate(route.path.replace(`/${defaultLocaleForDomain}`, ''), status)
+    } else if (!route.path.startsWith(`/${locale}`) && locale !== defaultLocaleForDomain) {
       const getLocaleFromRoute = createLocaleFromRouteGetter()
       const oldLocale = getLocaleFromRoute(route.path)
 
