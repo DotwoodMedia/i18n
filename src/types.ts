@@ -122,7 +122,7 @@ export type NuxtI18nOptions<
    * @defaultValue `false`
    */
   differentDomains?: boolean
-  multiDomain?: boolean
+  multiDomainLocales?: boolean
   detectBrowserLanguage?: DetectBrowserLanguageOptions | false
   langDir?: string | null
   lazy?: boolean

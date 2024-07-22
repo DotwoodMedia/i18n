@@ -77,7 +77,7 @@ export const DEFAULT_OPTIONS = {
   types: 'composition',
   debug: false,
   parallelPlugin: false,
-  multiDomain: false
+  multiDomainLocales: false
 } as const
 
 export const NUXT_I18N_TEMPLATE_OPTIONS_KEY = 'i18n.options.mjs'

@@ -161,7 +161,7 @@ export function detectLocale(
   detectLocaleContext: DetectLocaleContext,
   runtimeI18n: ModulePublicRuntimeConfig['i18n']
 ) {
-  const { strategy, defaultLocale, differentDomains, multiDomain } = runtimeI18n
+  const { strategy, defaultLocale, differentDomains, multiDomainLocales } = runtimeI18n
   const _detectBrowserLanguage = runtimeDetectBrowserLanguage(runtimeI18n)
 
   const initialLocale = isFunction(initialLocaleLoader) ? initialLocaleLoader() : initialLocaleLoader
@@ -202,7 +202,7 @@ export function detectLocale(
   __DEBUG__ && console.log('detectLocale: finaleLocale first (finaleLocale, strategy) -', finalLocale, strategy)
 
   if (!finalLocale) {
-    if (differentDomains || multiDomain) {
+    if (differentDomains || multiDomainLocales) {
       finalLocale = getLocaleDomain(normalizedLocales, strategy, route)
     } else if (strategy !== 'no_prefix') {
       finalLocale = routeLocaleGetter(route)
@@ -326,7 +326,7 @@ export async function navigate(
   { status = 302, enableNavigate = false }: { status?: number; enableNavigate?: boolean } = {}
 ) {
   const { nuxtApp, i18n, locale, route } = args
-  const { rootRedirect, differentDomains, multiDomain, skipSettingLocaleOnNavigate, configLocales } =
+  const { rootRedirect, differentDomains, multiDomainLocales, skipSettingLocaleOnNavigate, configLocales } =
     nuxtApp.$config.public.i18n
   let { redirectPath } = args
 
@@ -363,7 +363,7 @@ export async function navigate(
     }
   }
 
-  if (multiDomain) {
+  if (multiDomainLocales) {
     const host = getHost()
     const currentDomain = configLocales.find(locale => {
       if (typeof locale !== 'string') {

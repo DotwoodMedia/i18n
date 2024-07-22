@@ -52,7 +52,7 @@ export default defineNuxtPlugin({
     const { vueApp: app } = nuxt
     const nuxtContext = nuxt as unknown as NuxtApp
     const host = getHost()
-    const { configLocales, defaultLocale, multiDomain } = nuxtContext.$config.public.i18n
+    const { configLocales, defaultLocale, multiDomainLocales } = nuxtContext.$config.public.i18n
 
     const hasDefaultForDomains = configLocales.some(
       (l): l is LocaleObject => typeof l !== 'string' && Array.isArray(l.defaultForDomains)
@@ -71,7 +71,7 @@ export default defineNuxtPlugin({
       defaultLocaleDomain = ''
     }
 
-    if (multiDomain) {
+    if (multiDomainLocales) {
       const router = useRouter()
       router.getRoutes().forEach(route => {
         if (route.name?.toString().includes('___default')) {

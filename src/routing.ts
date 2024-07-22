@@ -145,7 +145,7 @@ export function localizeRoutes(routes: NuxtPage[], options: LocalizeRoutesParams
         extra
       )
       if (localePrefixable) {
-        if (options.multiDomain) {
+        if (options.multiDomainLocales) {
           localizedRoutes.push({
             ...localized,
             name: `${localized.name}___default`
