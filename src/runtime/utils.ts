@@ -383,7 +383,7 @@ export async function navigate(
       if (oldLocale !== '') {
         return _navigate(`/${locale + route.path.replace(`/${oldLocale}`, '')}`, status)
       } else {
-        return _navigate(`/${locale + route.path.replace('/', '')}`, status)
+        return _navigate(`/${locale + (route.path === '/' ? '' : route.path)}`, status)
       }
     } else if (redirectPath && route.path !== redirectPath) {
       return _navigate(redirectPath, status)
